@@ -1,0 +1,16 @@
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/stat.h>
+
+int main() {
+    int fid1, fid2, i;
+    char buff[1000];
+    fid1 = open("add.c", 0);
+    i = read(fid1, buff, 500);
+    creat("sample.c", S_IRWXU);
+    fid2 = open("sample.c", 2);
+    write(fid2, buff, i);
+    close(fid1);
+    close(fid2); 
+}

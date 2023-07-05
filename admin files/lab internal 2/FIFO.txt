@@ -1,0 +1,37 @@
+1.	FIFO:
+#include<stdio.h>
+int main ()
+{
+  int i, j, np, a[50], frame[10], nf, k, avail, count = 0;
+  printf ("ENTER THE NUMBER OF PAGES:");
+  scanf ("%d", &np);
+  printf ("ENTER THE PAGE NUMBER :");
+  for (i = 1; i <= np; i++)
+    scanf ("%d", &a[i]);
+  printf ("\n ENTER THE NUMBER OF FRAMES :");
+  scanf ("%d", &nf);
+  for (i = 0; i < nf; i++)
+    frame[i] = -1;
+  j = 0;
+  printf ("\tref string\t page frames\n");
+  for (i = 1; i <= np; i++)
+    {
+      printf ("%d\t\t", a[i]);
+      avail = 0;
+      for (k = 0; k < nf; k++)
+	if (frame[k] == a[i])
+	  avail = 1;
+      if (avail == 0)
+	{
+	  frame[j] = a[i];
+	  j = (j + 1) % nf;
+	  count++;
+	  for (k = 0; k < nf; k++)
+	    printf ("%d\t", frame[k]);
+	}
+      printf ("\n");
+    }
+  printf ("number of page faults: %d", count);
+  return 0;
+}
+ 

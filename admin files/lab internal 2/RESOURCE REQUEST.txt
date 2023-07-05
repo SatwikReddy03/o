@@ -1,0 +1,76 @@
+RESOURCE REQUEST:
+#include <stdio.h>
+#include <stdbool.h>
+#define MAX_PROCESS 10
+#define MAX_RESOURCE 10
+int numProcesses, numResources;
+int available[MAX_RESOURCE];
+int maxAllocation[MAX_PROCESS][MAX_RESOURCE];
+int currentAllocation[MAX_PROCESS][MAX_RESOURCE];
+int need[MAX_PROCESS][MAX_RESOURCE];
+void initialize() {
+    printf("Enter the number of processes: ");
+    scanf("%d", &numProcesses);
+    printf("Enter the number of resources: ");
+    scanf("%d", &numResources);
+    printf("Enter the available resources:\n");
+    for (int i = 0; i < numResources; i++) {
+        printf("Resource %d: ", i + 1);
+        scanf("%d", &available[i]);
+    }
+    printf("Enter the maximum allocation for each process:\n");
+    for (int i = 0; i < numProcesses; i++) {
+        printf("Process %d:\n", i + 1);
+        for (int j = 0; j < numResources; j++) {
+            printf("Resource %d: ", j + 1);
+            scanf("%d", &maxAllocation[i][j]);
+            currentAllocation[i][j] = 0;
+            need[i][j] = maxAllocation[i][j];
+        }
+    }
+}
+bool canRequest(int process, int request[]) {
+    for (int i = 0; i < numResources; i++) {
+        if (request[i] > need[process][i] || request[i] > available[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+void allocate(int process, int request[]) {
+    for (int i = 0; i < numResources; i++) {
+        available[i] -= request[i];
+        currentAllocation[process][i] += request[i];
+        need[process][i] -= request[i];
+    }
+}
+void release(int process, int release[]) {
+    for (int i = 0; i < numResources; i++) {
+        available[i] += release[i];
+        currentAllocation[process][i] -= release[i];
+        need[process][i] += release[i];
+    }
+}
+void handleRequest() {
+    int process;
+    int request[MAX_RESOURCE];
+    printf("Enter the process requesting resources (1-%d): ", numProcesses);
+    scanf("%d", &process);
+    process--;
+    printf("Enter the resource request for Process %d:\n", process + 1);
+    for (int i = 0; i < numResources; i++) {
+        printf("Resource %d: ", i + 1);
+        scanf("%d", &request[i]);
+    }
+    if (canRequest(process, request)) {
+        allocate(process, request);
+        printf("Resource request granted. Resources allocated to Process %d.\n", process + 1);
+    } else {
+        printf("Resource request denied. Resources cannot be allocated to Process %d.\n", process + 1);
+    }
+}
+int main() {
+    initialize();
+    handleRequest();
+    return 0;
+}

@@ -1,0 +1,31 @@
+//SCAN
+#include<stdio.h>
+#include<stdlib.h>
+#include<math.h>
+int cmp(const void *a,const void *b){
+    return((int *)a-(int *)b);
+}
+int main(){
+    int c,n,a[30],i,s,t;
+    printf("enter the max no of cylinders:");
+    scanf("%d",&c);
+    printf("enter the no of service requests:");
+    scanf("%d",&n);
+    printf("enter the service requests one by one:\n");
+    for(i=0;i<n;i++){
+        scanf("%d",&a[i]);
+    }
+    qsort(a,n,sizeof(int),cmp);
+    printf("enter the initial disk head position:");
+    scanf("%d",&s);
+    int s1=0,s2=0;
+    s1=(s-0)+(a[n-1]-0);
+    s2=(c-1-s)+(c-1-a[0]);
+    if(s1>s2){
+        t=s2;
+    }
+        else{t=s1;}
+    printf("total head movement is:%d",s2);
+    return 0;
+    
+}

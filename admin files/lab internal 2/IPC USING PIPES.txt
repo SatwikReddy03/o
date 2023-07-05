@@ -1,0 +1,20 @@
+
+	#include<stdio.h> #include<unistd.h> #include<stdlib.h>
+int main() {    
+int pipeid[2], n;    
+char buff1[100], buff2[100];    
+if (pipe(pipeid) < 0) {        
+printf("unable to create pipe");       
+exit(1);    }     
+else   {    
+printf("Type any massege to be send\n");   
+n = read(0, buff1, 100);    
+write(pipeid[1], buff1, n);   
+read(pipeid[0], buff2, n);    
+write(1, buff2, n);  
+} 
+return 0;}
+
+
+
+

@@ -1,0 +1,97 @@
+RESOURCE ALLOCATION GRAPH:
+#include <stdio.h>
+#include <stdbool.h>
+#define MAX_PROCESS 10
+#define MAX_RESOURCE 10
+int numProcesses, numResources;
+int available[MAX_RESOURCE];
+int maxAllocation[MAX_PROCESS][MAX_RESOURCE];
+int currentAllocation[MAX_PROCESS][MAX_RESOURCE];
+int need[MAX_PROCESS][MAX_RESOURCE];
+bool isSafe[MAX_PROCESS];
+void initialize() {
+    printf("Enter the number of processes: ");
+    scanf("%d", &numProcesses);
+    printf("Enter the number of resources: ");
+    scanf("%d", &numResources);
+    printf("Enter the available resources:\n");
+    for (int i = 0; i < numResources; i++) {
+        printf("Resource %d: ", i + 1);
+        scanf("%d", &available[i]);
+    }
+    printf("Enter the maximum allocation for each process:\n");
+    for (int i = 0; i < numProcesses; i++) {
+        printf("Process %d:\n", i + 1);
+        for (int j = 0; j < numResources; j++) {
+            printf("Resource %d: ", j + 1);
+            scanf("%d", &maxAllocation[i][j]);
+            currentAllocation[i][j] = 0;
+            need[i][j] = maxAllocation[i][j];
+        }
+    }
+}
+bool canAllocate(int process, int request[]) {
+    for (int i = 0; i < numResources; i++) {
+        if (request[i] > need[process][i] || request[i] > available[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+void allocate(int process, int request[]) {
+    for (int i = 0; i < numResources; i++) {
+        available[i] -= request[i];
+        currentAllocation[process][i] += request[i];
+        need[process][i] -= request[i];
+    }
+}
+void release(int process) {
+    for (int i = 0; i < numResources; i++) {
+        available[i] += currentAllocation[process][i];
+        currentAllocation[process][i] = 0;
+        need[process][i] = maxAllocation[process][i];
+    }
+}
+void detectDeadlock() {
+    bool isVisited[numProcesses];
+    int work[MAX_RESOURCE];
+    for (int i = 0; i < numProcesses; i++) {
+        isVisited[i] = false;
+    }
+    for (int i = 0; i < numResources; i++) {
+        work[i] = available[i];
+    }
+    int count = 0;
+    while (count < numProcesses) {
+        bool isSafeState = false;
+        for (int i = 0; i < numProcesses; i++) {
+            if (!isVisited[i] && canAllocate(i, need[i])) {
+                allocate(i, maxAllocation[i]);
+
+                isVisited[i] = true;
+                isSafe[count] = true;
+                count++;
+                isSafeState = true;
+                break;
+            }
+        }
+        if (!isSafeState) {
+            break;
+        }
+    }
+    if (count == numProcesses) {
+        printf("No deadlock detected.\n");
+    } else {
+        printf("Deadlock detected. Processes involved in the deadlock:\n");
+        for (int i = 0; i < numProcesses; i++) {
+            if (!isSafe[i]) {
+                printf("Process %d\n", i + 1);
+            }
+        }
+    }
+}
+int main() {
+    initialize();
+    detectDeadlock();
+    return 0;
+}

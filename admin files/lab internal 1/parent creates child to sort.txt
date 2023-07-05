@@ -1,0 +1,33 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<sys/wait.h>
+#include<unistd.h>
+#define n 5
+int a[n], rv, i, j, temp, r, f();
+pid_t p;
+int main() {
+    printf("\nI am parent and my pid is %d\n", getpid());
+    printf("Enter %d numbers to be sort...\n", n);
+    for (i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+if (fork() == 0) {
+        printf("I am child with pid %d and doing sorting...\n", getpid());
+        for (i = 0; i < n; i++)
+            for (j = i + 1; j < n; j++)
+                if (a[j] < a[i]) {
+                    temp = a[i]; a[i] = a[j]; a[j] = temp;
+                }
+        printf("The sorted elements are...");
+        for (i = 0; i < n; i++)
+            printf("%d ", a[i]);
+        printf("\nEnter child exit status value(0)...\n\n");
+        scanf("%d", &rv);
+        exit(0);
+    } /* terminate child */
+else {
+        printf("parent is waiting for child to exit\n");
+        p = wait(&rv); /* reaping parent */
+        printf("Child has terminated ... \n");
+    }
+    return 0;
+}

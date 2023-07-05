@@ -1,0 +1,20 @@
+//pexec1.c
+#include<stdio.h>
+#include<unistd.h>
+int main() {
+    printf("I am pexec1.c called by execv()\n");
+    printf("PID of pexec1.c is %d\n", getpid());
+    return 0;
+}
+//pexecv.c
+#include<stdio.h>
+#include<unistd.h>
+int main() {
+    printf("I am in pexecv.c\n");
+    printf("PID of pexecv.c is %d\n", getpid());
+    char *args[]={"./pexec1",NULL};
+    printf("Beginning-----\n");
+    execv(args[0],args);
+    printf("Ending....coming back to pexecv.c\n");
+    return 0;
+}

@@ -1,0 +1,44 @@
+FCFS
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+int abs_diff(int a, int b) {
+    return abs(a - b);
+}
+
+int main() {
+    int n, head, total_movement = 0;
+
+    printf("Enter the number of disk requests: ");
+    scanf("%d", &n);
+
+    printf("Enter the initial position of the disk head: ");
+    scanf("%d", &head);
+
+    int *requests = (int *)malloc(n * sizeof(int));
+    if (requests == NULL) {
+        printf("Memory allocation failed!\n");
+        return 1;
+    }
+
+    printf("Enter the disk request queue: ");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &requests[i]);
+    }
+
+    // FCFS Disk Scheduling Algorithm
+    printf("\nSequence of disk head movements:\n");
+    printf("%d ", head);
+
+    for (int i = 0; i < n; i++) {
+        total_movement += abs_diff(head, requests[i]);
+        head = requests[i];
+        printf("%d ", head);
+    }
+
+    printf("\n\nTotal disk head movements: %d\n", total_movement);
+
+    free(requests);
+    return 0;
+}

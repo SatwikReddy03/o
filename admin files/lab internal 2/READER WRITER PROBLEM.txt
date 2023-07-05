@@ -1,0 +1,77 @@
+READER WRITER PROBLEM:
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <pthread.h>
+#define NUM_READERS 5
+#define NUM_WRITERS 2
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
+pthread_cond_t cond_readers = PTHREAD_COND_INITIALIZER;
+pthread_cond_t cond_writers = PTHREAD_COND_INITIALIZER;
+int sharedData = 0;
+int activeReaders = 0;
+int waitingWriters = 0;
+int activeWriters = 0;
+void* reader(void* arg) {
+    int id = *(int*)arg;
+    pthread_mutex_lock(&mutex);
+    while (activeWriters > 0 || waitingWriters > 0) {
+        pthread_cond_wait(&cond_readers, &mutex);
+    }
+    activeReaders++;
+    pthread_mutex_unlock(&mutex);
+    printf("Reader %d read shared data: %d\n", id, sharedData);
+    pthread_mutex_lock(&mutex);
+    activeReaders--;
+    if (activeReaders == 0) {
+        pthread_cond_signal(&cond_writers);
+    }
+    pthread_mutex_unlock(&mutex);
+
+    pthread_exit(NULL);
+}
+void* writer(void* arg) {
+    int id = *(int*)arg;
+    pthread_mutex_lock(&mutex);
+    waitingWriters++;
+    while (activeReaders > 0 || activeWriters > 0) {
+        pthread_cond_wait(&cond_writers, &mutex);
+    }
+    waitingWriters--;
+    activeWriters++;
+    pthread_mutex_unlock(&mutex);
+    sharedData = id + 1;
+    printf("Writer %d wrote shared data: %d\n", id, sharedData);
+    pthread_mutex_lock(&mutex);
+    activeWriters--;
+    if (waitingWriters > 0) {
+        pthread_cond_signal(&cond_writers);
+    } else {
+        pthread_cond_broadcast(&cond_readers);
+    }
+    pthread_mutex_unlock(&mutex);
+
+    pthread_exit(NULL);
+}
+int main() {
+    pthread_t readers[NUM_READERS];
+    pthread_t writers[NUM_WRITERS];
+    int readerIds[NUM_READERS];
+    int writerIds[NUM_WRITERS];
+    for (int i = 0; i < NUM_READERS; i++) {
+        readerIds[i] = i + 1;
+        pthread_create(&readers[i], NULL, reader, (void*)&readerIds[i]);
+    }
+    for (int i = 0; i < NUM_WRITERS; i++) {
+        writerIds[i] = i + 1;
+        pthread_create(&writers[i], NULL, writer, (void*)&writerIds[i]);
+    }
+    for (int i = 0; i < NUM_READERS; i++) {
+        pthread_join(readers[i], NULL);
+    }
+    for (int i = 0; i < NUM_WRITERS; i++) {
+        pthread_join(writers[i], NULL);
+    }
+
+    return 0;
+}

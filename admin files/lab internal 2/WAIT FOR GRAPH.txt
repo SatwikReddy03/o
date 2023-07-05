@@ -1,0 +1,51 @@
+//WAIT FOR GRAPH:
+#include <stdio.h>
+#include <stdbool.h>
+#define MAX_PROCESS 10
+int numProcesses;
+int waitGraph[MAX_PROCESS][MAX_PROCESS];
+void initialize() {
+    printf("Enter the number of processes: ");
+    scanf("%d", &numProcesses);
+    printf("Enter the wait-for graph (1 for dependency, 0 for no dependency):\n");
+    for (int i = 0; i < numProcesses; i++) {
+        for (int j = 0; j < numProcesses; j++) {
+            scanf("%d", &waitGraph[i][j]);
+        }
+    }
+}
+bool isSafeState() {
+    int numFinished = 0;
+    bool isFinished[MAX_PROCESS] = { false };
+    while (numFinished < numProcesses) {
+        bool found = false;
+        for (int i = 0; i < numProcesses; i++) {
+            if (!isFinished[i]) {
+                bool canExecute = true;
+                for (int j = 0; j < numProcesses; j++) {
+                    if (waitGraph[j][i] && !isFinished[j]) {
+                        canExecute = false;
+                        break;
+                    }
+                }
+                if (canExecute) {
+                    isFinished[i] = true;
+                    numFinished++;
+                    found = true;
+                    break;
+                }
+            }
+        }
+        if (!found) {
+            return false;
+        }
+    }
+    return true;
+}
+int main() {
+    initialize();
+    if (isSafeState()) {
+        printf("The system is in a safe state.\n");
+    } else {
+        printf("The system is in an unsafe state. Deadlock may occur.\n");
+    } return 0;}
